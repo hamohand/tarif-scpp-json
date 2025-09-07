@@ -1,0 +1,64 @@
+<!-- Section pour charger le fichier -->
+<div class="file-upload-container">
+    <h2>1. Charger votre fichier de données</h2>
+    <p>Sélectionnez un fichier .tsv ou .csv depuis votre ordinateur.</p>
+    <input type="file" (change)="onFileSelected($event)" accept=".tsv,.csv,.txt" />
+    <div *ngIf="isLoading && !isSearchComplete" class="loading-message">
+        Chargement du fichier en cours...
+    </div>
+</div>
+
+<!-- Le reste de l'interface est affiché seulement si un fichier est chargé -->
+<div *ngIf="lesarticles.length > 0">
+    <hr>
+    <h2>2. Lancer la recherche</h2>
+    <p>Fichier chargé : <strong>{{ fileName }}</strong></p>
+
+    <h3  *ngIf="!isSearchComplete">Données du fichier :</h3>
+    <table  *ngIf="!isSearchComplete" class="couleurFond" border="0" width="70%">
+        <tbody>
+        <tr *ngFor="let e of lesarticles">
+            <td>
+                <!-- contenu : -->
+                {{e.article}} : {{e.code}}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="search-form">
+        <button
+                (click)="search()"
+                [disabled]="isLoading"
+                class="search-button"
+        >
+            {{ isLoading ? 'Recherche en cours...' : 'Lancer la recherche des codes' }}
+        </button>
+
+        <!-- Ce bouton n'apparaît qu'une fois la recherche terminée -->
+        <button
+                *ngIf="isSearchComplete && !isLoading"
+                (click)="saveAndDownload()"
+                class="save-button"
+        >
+            Enregistrer et Télécharger les résultats
+        </button>
+    </div>
+
+    <div *ngIf="error" class="error-message">
+        {{ error }}
+    </div>
+
+    <h3 *ngIf="isSearchComplete">- Données mises à jour :</h3>
+    <table class="couleurFond" border="0" width="70%" *ngIf="isSearchComplete">
+        <tbody>
+        <tr *ngFor="let e of lesarticles">
+            <td>
+                <!-- contenu : -->
+                {{e.article}} : {{e.code}}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+

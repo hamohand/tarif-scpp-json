@@ -1,0 +1,28 @@
+<div class="student-container">
+<h2>--Chapitres--</h2>
+
+<div *ngIf="isLoading" class="loading">
+    Chargement en cours...
+</div>
+
+<div *ngIf="error" class="error">
+    {{ error }}
+</div>
+
+<div *ngIf="chapitres && !isLoading" class="results">
+    <table class="student-table">
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let chapitre of chapitres">
+            <td>{{ chapitre.code }}</td>
+            <td>{{ chapitre.description}}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</div>
