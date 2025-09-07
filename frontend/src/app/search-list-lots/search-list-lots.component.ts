@@ -3,7 +3,20 @@ import {NgForOf, NgIf} from "@angular/common";
 import {Article} from "../../assets/objets/articles";
 import {SearchService} from "../services/search.service";
 import * as Papa from "papaparse";
-import {bufferCount, catchError, concatMap, delay, finalize, forkJoin, from, Observable, of, reduce, tap} from "rxjs";
+import {
+    bufferCount,
+    catchError,
+    concatMap,
+    delay,
+    finalize,
+    forkJoin,
+    from,
+    map,
+    Observable,
+    of,
+    reduce,
+    tap
+} from "rxjs";
 
 @Component({
   selector: 'app-search-list-lots',
@@ -18,6 +31,7 @@ import {bufferCount, catchError, concatMap, delay, finalize, forkJoin, from, Obs
 export class SearchListLotsComponent {
     lesarticles: Article[] = [];
     fileName: string = '';
+    reponse: string = ''
     isLoading: boolean = false;
     error: string | null = null;
     isSearchComplete: boolean = false;
@@ -138,11 +152,42 @@ export class SearchListLotsComponent {
         });
     }
 
+    // fichier résultat
     private createArticleSearchObservable(article: Article): Observable<string> {
         if (!article.article || !article.article.trim()) {
             return of(article.code || '').pipe(delay(0));
         }
+        // seule la valeur de 'code' est extraite et utilisée pour chaque article `code`
         return this.searchService.searchCodes(article.article).pipe(
+
+            map((response: any) => {
+                let results;
+                try {
+                    // On s'assure que les résultats sont bien un objet/tableau et non une chaîne JSON
+                    results = typeof response === 'string' ? JSON.parse(response) : response;
+                } catch (e) {
+                    console.error(`Erreur d'analyse JSON pour l'article "${article.article}" :`, e);
+                    return article.code || ''; // Retourne le code original si le JSON est invalide
+                }
+
+                // Extrait le code du premier résultat, s'il est disponible
+                if (Array.isArray(results) && results.length > 0 && results[0].code) {
+                    //return results[0].code;
+                    for (let i = 0; i < results.length; i++) {
+                        if (results[i].code) {
+                            if (i == 0) { // éviter la virgule au début
+                                this.reponse = results[i].code;
+                                continue;
+                            }
+                            this.reponse = this.reponse + ", " + results[i].code;
+                            return this.reponse;
+                        }
+                    }
+                }
+
+
+                return article.code || ''; // Retourne le code original si aucun résultat n'est trouvé
+            }),
             catchError(err => {
                 console.error(`Erreur API pour l'article "${article.article}":`, err);
                 if (!this.error) {

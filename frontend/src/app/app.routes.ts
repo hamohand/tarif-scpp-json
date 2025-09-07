@@ -7,15 +7,16 @@ import {SearchListLotsComponent} from "./search-list-lots/search-list-lots.compo
 
 export const routes: Routes = [
     // Article unique
-     { path: '', redirectTo: 'search', pathMatch: 'full' },
-     { path: 'search', component: SearchComponent },
-     { path: '**', redirectTo: 'search' }
+//     { path: '', redirectTo: 'search', pathMatch: 'full' },
+//     { path: 'search', component: SearchComponent },
+//     { path: '**', redirectTo: 'search' }
 
     //Liste d'articles: examine par lots de 5 articles il attend 61s après chaque lot pour 'soulager le LLM'.
-//    { path: '', redirectTo: 'searchListLots', pathMatch: 'full' },
-//    { path: 'searchListLots', component: SearchListLotsComponent },
-//    { path: '**', redirectTo: 'searchListLots'}
+    { path: '', redirectTo: 'searchListLots', pathMatch: 'full' },
+    { path: 'searchListLots', component: SearchListLotsComponent },
+    { path: '**', redirectTo: 'searchListLots'}
 
+    ///////////////////
     // Liste d'articles
     // { path: '', redirectTo: 'searchList', pathMatch: 'full' },
     // { path: 'searchList', component: SearchListComponent },

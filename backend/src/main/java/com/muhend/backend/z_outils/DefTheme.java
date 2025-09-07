@@ -64,7 +64,7 @@ public class DefTheme {
     }
 
     //description, justification
-    public static DefTheme getThemeDescJustif() {
+    public static DefTheme getThemeDescripJustif() {
         return DefTheme.builder()
                 .withDescription(true)
                 .withJustification(true)
@@ -93,14 +93,14 @@ public class DefTheme {
     }
 
     //description, en cascade
-    public static DefTheme getThemeCodesDescCascade() {
+    public static DefTheme getThemeDescripCascade() {
         return DefTheme.builder()
                 .withDescription(true)
                 .withCascade(true)
                 .build();
     }
     //description
-    public static DefTheme getThemeCodesDescription() {
+    public static DefTheme getThemeDescrip() {
         return DefTheme.builder()
                 .withDescription(true)
                 .build();

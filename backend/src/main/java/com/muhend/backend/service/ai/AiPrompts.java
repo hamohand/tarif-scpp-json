@@ -10,11 +10,16 @@ public class AiPrompts {
 
     // ------------------ Choix du thème de la structure d'affichage ----------------------------
 
-    //public DefTheme defTheme = DefTheme.getCode();
+    public DefTheme defTheme = DefTheme.getCode();
+    //
     //public DefTheme defTheme = DefTheme.getThemeJustif();
     //public DefTheme defTheme = DefTheme.getThemeJustifCascade();
-    public DefTheme defTheme = DefTheme.getThemeAll();
-    // public DefTheme defTheme = DefTheme.getThemeDescJustif();
+    //
+    //public DefTheme defTheme = DefTheme.getThemeDescrip();
+    //public DefTheme defTheme = DefTheme.getThemeDescripCascade();
+    //
+    //public DefTheme defTheme = DefTheme.getThemeDescripJustif();
+    //public DefTheme defTheme = DefTheme.getThemeAll();
 
     /// ///////////////////////////////////////////////////////////
 
