@@ -98,16 +98,23 @@ public class RechercheController {
         List<Position> ragNiveau;
         // Liste des codes des positions du niveau
         List<String> codes = new ArrayList<>();
+        // Nombre de tentatives de recherche d'un terme si la recherche n'est pas fructueuse (limité à 2 pour le moment)
+        int tentativesMax = 2;
         // Nombre de tokens utilisés
         int tokensUsed = 0;
 
         // --------------------------- Level 0 : Sections ---------------------------------------
         ragNiveau = ragSections();
         //IA
-        positions = aiService.promptEtReponse(SearchLevel.SECTIONS.toString(), termeRecherche, ragNiveau); // AI: recherche des positions du niveau
+        int nbTentatives = 0; // nombre de tentatives de recherche IA
+        do {
+            nbTentatives++;
+            positions = aiService.promptEtReponse(SearchLevel.SECTIONS.toString(), termeRecherche, ragNiveau); // AI: recherche des positions du niveau
+        } while (nbTentatives < tentativesMax && positions.isEmpty());
         if (positions.isEmpty()) {
             return null;
         }
+
         // Description
         if (aiPrompts.defTheme.isWithDescription()) { // affichage avec les descriptions
             for (Position position : positions) {
@@ -135,7 +142,11 @@ public class RechercheController {
         // ----------------------------- Level 1: Chapitres ----------------------------------------
         reponseListLevel.clear(); // On réinitialise la liste des positions du niveau courant
         ragNiveau = ragChapitres(positions); // calcul du RAG avec les positions des sections trouvées ci-dessus. Si pas de sections on utilise la liste des chapitres
-        positions = aiService.promptEtReponse(SearchLevel.CHAPITRES.toString(), termeRecherche, ragNiveau); // AI: recherche des positions du niveau
+        nbTentatives = 0; // nombre de tentatives de recherche IA
+        do {
+            nbTentatives++;
+            positions = aiService.promptEtReponse(SearchLevel.CHAPITRES.toString(), termeRecherche, ragNiveau); // AI: recherche des positions du niveau
+        } while (nbTentatives < tentativesMax && positions.isEmpty());
         if (positions.isEmpty()) {
             return null;
         }
@@ -165,8 +176,13 @@ public class RechercheController {
         // ------------------------------- Level 2 : Positions 4 -------------------------------------------------
         reponseListLevel.clear(); // On réinitialise la liste des positions du niveau courant
         ragNiveau = ragPositions4(positions); // positions de chapitres
-        List<Position> positionsPositions4 = aiService.promptEtReponse(SearchLevel.POSITIONS4.toString(), termeRecherche, ragNiveau); // AI: recherche des positions du niveau
-        positions = positionsPositions4; // cette écriture en apparence redondante, permet de conserver un code analogue aux autres niveaux (on stocke positionsPositions4)
+        nbTentatives = 0; // nombre de tentatives de recherche IA
+        do {
+            nbTentatives++;
+            positions = aiService.promptEtReponse(SearchLevel.POSITIONS4.toString(), termeRecherche, ragNiveau); // AI: recherche des positions du niveau
+        } while (nbTentatives < tentativesMax && positions.isEmpty());
+        List<Position> positionsPositions4 = positions; // écriture en apparence redondante, on stocke positionsPositions4 pour une possible utilisation ultérieure
+
         if (positions.isEmpty()) {
             return null;
         }
@@ -194,9 +210,14 @@ public class RechercheController {
 
         // ------------------------------- Level 3 : Positions 6 - le plus haut pour le moment-------------------------------------------------
         reponseListLevel.clear(); // On réinitialise la liste des positions du niveau courant
-        ragNiveau = ragPositions6(positions); // positions de chapitres
-        List<Position> positionsPositions6Dz = aiService.promptEtReponse(SearchLevel.POSITIONS6.toString(), termeRecherche, ragNiveau); // AI: recherche des positions du niveau
-        positions = positionsPositions6Dz; // cette écriture en apparence redondante, permet de conserver un code analogue aux autres niveaux
+        ragNiveau = ragPositions6(positions); // positions de positions4
+        nbTentatives = 0; // nombre de tentatives de recherche IA
+        do {
+            nbTentatives++;
+            positions = aiService.promptEtReponse(SearchLevel.POSITIONS6.toString(), termeRecherche, ragNiveau); // AI: recherche des positions du niveau
+        } while (nbTentatives < tentativesMax && positions.isEmpty());
+        List<Position> positionsPositions6Dz = positions; // écriture en apparence redondante, on stocke positionsPositions4 pour une possible utilisation ultérieure
+
         if (positions.isEmpty()) { // Si positionsPositions6 est vide, on affiche le résultat de positionsPositions4
             if (!positionsPositions4.isEmpty()){ // Si positionsPositions4 n'est pas vide
                 positions = positionsPositions4;
