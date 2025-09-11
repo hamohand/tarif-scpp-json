@@ -55,7 +55,7 @@ export class SearchListComponent {
           error: (err) => {
             // Ce bloc est une sécurité, les erreurs individuelles étant déjà traitées.
             this.error = 'Une erreur inattendue est survenue lors du traitement des recherches.';
-            console.error('Erreur inattendue dans forkJoin:', err);
+            console.error(err);
           }
         });
   }
@@ -74,7 +74,7 @@ export class SearchListComponent {
 
     return this.searchService.searchCodes(article.article).pipe(
         catchError(err => {
-          console.error(`Erreur lors de la recherche pour "${article.article}":`, err);
+          console.error(err);
           // On définit un message d'erreur général seulement s'il n'y en a pas déjà un.
           if (!this.error) {
             this.error = 'Une erreur est survenue lors de la recherche. Veuillez réessayer.';

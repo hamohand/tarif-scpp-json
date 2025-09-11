@@ -35,7 +35,7 @@ export class ChapitresComponent implements OnInit{
             this.isLoading = false;
           },
           error: (err: any) => {
-            console.error('Error loading chapitres:', err);
+            console.error(err);
             this.error = 'Une erreur est survenue lors du chargement des chapitres. Veuillez réessayer.';
             this.isLoading = false;
           }

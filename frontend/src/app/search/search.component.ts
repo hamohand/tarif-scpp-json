@@ -211,7 +211,7 @@ export class SearchComponent {
                   // On s'assure que les résultats sont bien un objet/tableau et non une chaîne JSON
                   this.searchResults = typeof results === 'string' ? JSON.parse(results) : results;
               } catch (e) {
-                  console.error('Erreur lors de l\'analyse des résultats JSON :', e);
+                  console.error(e);
                   this.error = 'Une erreur est survenue lors du traitement des résultats.';
                   this.searchResults = [];
               }
@@ -224,7 +224,7 @@ export class SearchComponent {
               this.isLoading = false;
           },
           error: (err: any) => {
-              console.error('Error searching chapters:', err);
+              console.error(err);
               this.error = 'Une erreur est survenue lors de la recherche. Veuillez réessayer.';
           this.isLoading = false;
         }

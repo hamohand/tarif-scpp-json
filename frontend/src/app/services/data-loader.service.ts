@@ -27,7 +27,7 @@ export class DataLoaderService {
 
                     if (parsedData.errors.length > 0) {
                         // S'il y a des erreurs, on les affiche et on retourne un tableau vide
-                        console.error('Erreurs de parsing CSV:', parsedData.errors);
+                        console.error(parsedData.errors);
                         return [];
                     }
 

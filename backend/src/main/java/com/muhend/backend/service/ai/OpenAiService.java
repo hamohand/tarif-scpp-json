@@ -37,6 +37,8 @@ public class OpenAiService {
     private final int maxTokens = 500;
     private final float temperature = 0.0F;
 
+    double prix_requete = 0.00;
+
 //    /// //////////////// Options pour le prompt et le résultat /////////////////////////////////////
 //    // - message système: true avec justification false sans.
 //    private final Boolean withJustification = false;
@@ -115,8 +117,8 @@ public class OpenAiService {
             final double PRICE_INPUT = 0.15 / 1_000_000;   // $ par token input
             final double PRICE_OUTPUT = 0.60 / 1_000_000;  // $ par token output
             final double PRICE_TOTAL = PRICE_INPUT + PRICE_OUTPUT;
-
-            final double prix_requete = totalTokens * PRICE_TOTAL;
+            //total requete
+            prix_requete = totalTokens * PRICE_TOTAL;
 
             // Enregistrer ou afficher les informations des tokens pour diagnostic
 //            log.info("Prompt Tokens (input), niveau : " + titre +" = " + promptTokens);

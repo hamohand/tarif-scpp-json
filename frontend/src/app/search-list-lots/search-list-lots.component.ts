@@ -18,6 +18,7 @@ import {
     tap
 } from "rxjs";
 
+// @ts-ignore
 @Component({
   selector: 'app-search-list-lots',
   standalone: true,
@@ -35,13 +36,14 @@ export class SearchListLotsComponent {
     isLoading: boolean = false;
     error: string | null = null;
     isSearchComplete: boolean = false;
+    isSaved: boolean = false;
 
     completedCount: number = 0;
     totalCount: number = 0;
 
     // Réglages basés sur votre analyse : 5 requêtes par minute
-    private readonly BATCH_SIZE = 5;
-    private readonly DELAY_BETWEEN_BATCHES = 61000; // 61 secondes
+    private readonly BATCH_SIZE = 5; // Liste par lots de 5 d'articles
+    private readonly DELAY_BETWEEN_BATCHES = 61000; // 61 secondes entre les recherches Ai de 2 lots de 5 d'articles
 
     constructor(private searchService: SearchService) {}
 
@@ -55,38 +57,72 @@ export class SearchListLotsComponent {
         this.lesarticles = [];
         this.error = null;
         this.isSearchComplete = false;
+        this.isSaved = false;
         this.completedCount = 0;
         this.totalCount = 0;
 
-        const reader = new FileReader();
-        reader.onload = () => {
-            const fileContent = reader.result as string;
-            //const delimiter = file.name.toLowerCase().endsWith('.tsv') ? '\t' : ',';
-            Papa.parse<Article>(fileContent, {
-                header: true,
-                skipEmptyLines: true,
-                transformHeader: header => header.toLowerCase().trim(),
-                //delimiter: delimiter,
-                complete: (results) => {
-                    if (results.errors.length > 0) {
-                        this.error = `Erreur d'analyse : ${results.errors[0].message}`;
-                    } else {
-                        this.lesarticles = results.data;
-                        this.totalCount = this.lesarticles.length;
-                    }
-                    this.isLoading = false;
+        const fileName = file.name.toLowerCase();
+
+        // Pour les fichiers .xls, .xlsx, .ods, on les envoie au backend pour conversion en TSV.
+        if (fileName.endsWith('.xls') || fileName.endsWith('.xlsx') || fileName.endsWith('.ods')) {
+            this.searchService.convertFile(file).subscribe({
+                next: (tsvContent: string) => {
+                    this.parseCsvData(tsvContent);
                 },
-                error: (err: any) => {
-                    this.error = `Erreur de lecture du fichier : ${err.message}`;
+                error: (err: { error: any; message: any; }) => {
+                    this.error = `Erreur lors de la conversion du fichier : ${err.error || err.message}`;
                     this.isLoading = false;
                 }
             });
-        };
-        reader.onerror = () => {
-            this.error = "Impossible de lire le fichier sélectionné.";
+            // Pour les fichiers .csv et .tsv, on les lit directement et on les traite comme du TSV.
+        } else if (fileName.endsWith('.csv') || fileName.endsWith('.tsv')) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const fileContent = reader.result as string;
+                this.parseCsvData(fileContent);
+            };
+            reader.onerror = () => {
+                this.error = "Impossible de lire le fichier sélectionné.";
+                this.isLoading = false;
+            };
+            reader.readAsText(file, 'UTF-8');
+        } else {
+            this.error = "Format de fichier non supporté. Veuillez sélectionner un fichier .csv, .tsv, .xls, .xlsx, ou .ods.";
             this.isLoading = false;
-        };
-        reader.readAsText(file, 'UTF-8');
+        }
+    }
+
+
+    private parseCsvData(csvContent: string): void {
+        Papa.parse<Article>(csvContent, {
+            header: true,
+            skipEmptyLines: true,
+            delimiter: "\t", // On utilise TOUJOURS la tabulation comme délimiteur
+            transformHeader: (header: string) => {
+                const normalizedHeader = header.toLowerCase().trim();
+                // Si l'en-tête est 'articles', on le normalise en 'article'
+                if (normalizedHeader === 'articles') {
+                    return 'article';
+                }
+                return normalizedHeader;
+            },
+            complete: (results: { errors: any[]; data: Article[]; }) => {
+                if (results.errors.length > 0) {
+                    this.error = `Erreur d'analyse TSV : ${results.errors.map(e => e.message).join(', ')}`;
+                } else {
+                    this.lesarticles = results.data;
+                    console.log("results: ", results);
+                    console.log("les articles : "+this.lesarticles);
+                    this.totalCount = this.lesarticles.length;
+                    console.log("Nombre d'articles : "+this.lesarticles.length);
+                }
+                this.isLoading = false;
+            },
+            error: (err: any) => {
+                this.error = `Erreur de lecture des données CSV : ${err.message}`;
+                this.isLoading = false;
+            }
+        });
     }
 
     /**
@@ -105,8 +141,9 @@ export class SearchListLotsComponent {
             bufferCount(this.BATCH_SIZE),
 
             // 2. Traite chaque paquet l'un après l'autre
-            concatMap((batchOfArticles, index) => {
-                console.log(`Traitement du paquet n°${index + 1} (${batchOfArticles.length} articles)...`);
+            //concatMap((batchOfArticles: any[], index: number) => {
+            concatMap((batchOfArticles: Article[], index: number) => {
+                    console.log(`Traitement du paquet n°${index + 1} (${batchOfArticles.length} articles)...`);
 
                 // Crée les requêtes pour le paquet en cours
                 const searchRequests$ = batchOfArticles.map(article =>
@@ -129,7 +166,8 @@ export class SearchListLotsComponent {
             }),
 
             // 3. Rassemble les résultats de tous les paquets
-            reduce((acc, batchResults) => acc.concat(batchResults), [] as string[]),
+            //reduce((acc: string | any[], batchResults: any) => acc.concat(batchResults), [] as string[]),
+            reduce((acc: string[], batchResults: string[]) => acc.concat(batchResults), [] as string[]),
 
             // 4. Se déclenche quand TOUT est terminé
             finalize(() => {
@@ -137,7 +175,7 @@ export class SearchListLotsComponent {
                 this.isSearchComplete = true;
             })
         ).subscribe({
-            next: (allResults) => {
+            next: (allResults: string[]) => {
                 allResults.forEach((code, index) => {
                     if (this.lesarticles[index]) {
                         this.lesarticles[index].code = code;
@@ -145,9 +183,9 @@ export class SearchListLotsComponent {
                 });
                 console.log("Traitement de tous les paquets terminé.", this.lesarticles);
             },
-            error: (err) => {
+            error: (err: any) => {
                 this.error = 'Une erreur majeure est survenue pendant le traitement des paquets.';
-                console.error('Erreur dans le flux principal:', err);
+                console.error(err);
             }
         });
     }
@@ -166,7 +204,7 @@ export class SearchListLotsComponent {
                     // On s'assure que les résultats sont bien un objet/tableau et non une chaîne JSON
                     results = typeof response === 'string' ? JSON.parse(response) : response;
                 } catch (e) {
-                    console.error(`Erreur d'analyse JSON pour l'article "${article.article}" :`, e);
+                    console.error(e);
                     return article.code || ''; // Retourne le code original si le JSON est invalide
                 }
 
@@ -188,8 +226,8 @@ export class SearchListLotsComponent {
 
                 return article.code || ''; // Retourne le code original si aucun résultat n'est trouvé
             }),
-            catchError(err => {
-                console.error(`Erreur API pour l'article "${article.article}":`, err);
+            catchError((err: any) => {
+                console.error(err);
                 if (!this.error) {
                     this.error = 'Certaines requêtes ont échoué. Les codes originaux sont conservés.';
                 }
@@ -199,33 +237,31 @@ export class SearchListLotsComponent {
     }
 
     saveAndDownload(): void {
-        if (!this.lesarticles?.length) return;
-        const tsvContent = Papa.unparse(this.lesarticles, { delimiter: "\t", header: true });
+        if (!this.lesarticles?.length) {
+            return;
+        }
+
+        const tsvContent = Papa.unparse(this.lesarticles, {
+            delimiter: "\t",
+            header: true,
+        });
+
         const blob = new Blob([tsvContent], { type: 'text/tab-separated-values;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
-        link.href = url;
-        link.download = `resultat-${this.fileName}`;
+
+        // On s'assure que le nom du fichier de sortie a TOUJOURS l'extension .tsv
+        const baseFileName = this.fileName.substring(0, this.fileName.lastIndexOf('.')) || this.fileName;
+        link.setAttribute("href", url);
+        link.setAttribute("download", `resultat-${baseFileName}.tsv`);
+
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
+        this.isSaved = true;
     }
+
 }
-/**
- * ### Le Problème : Exécution Parallèle avec `forkJoin`
- * Le comportement que vous décrivez est typique d'un serveur qui reçoit trop de requêtes simultanées. Voici ce qui se passe :
- * 1. **est Parallèle`forkJoin`** : L'opérateur attend que vous lui donniez une liste d'Observables (vos requêtes de recherche). Dès qu'il s'abonne, il lance **toutes les requêtes en même temps**, en parallèle. `forkJoin`
- * 2. **Surcharge du Serveur** : Si vous avez 3, 5 ou 10 articles, votre application envoie 3, 5 ou 10 requêtes HTTP au serveur backend _exactement au même moment_. De nombreux serveurs ou API sont configurés avec des mécanismes de protection (appelés "rate limiting" ou limitation de débit) pour éviter d'être surchargés. Lorsqu'ils détectent un afflux soudain de requêtes depuis la même source, ils peuvent en rejeter certaines, ce qui provoque les erreurs que vous observez.
- *
- * Une recherche unique fonctionne bien car elle n'active pas ces protections. C'est le volume soudain de requêtes qui pose problème.
- * ### La Solution : Exécution Séquentielle avec `concatMap`
- * Pour résoudre ce problème, nous devons cesser d'envoyer toutes les requêtes en même temps. À la place, nous allons les exécuter les unes après les autres : envoyer une requête, attendre sa réponse, puis envoyer la suivante. C'est ce qu'on appelle une exécution **séquentielle**.
- * L'opérateur RxJS parfait pour cela est `concatMap`.
- * Voici comment nous pouvons modifier votre code pour utiliser cette stratégie :
- * 1. Nous utiliserons `from(this.lesarticles)` pour créer un flux (Observable) qui émettra chaque article de votre liste, un par un.
- * 2. Nous utiliserons l'opérateur sur ce flux. `pipe`
- * 3. À l'intérieur de , nous utiliserons `concatMap`. Pour chaque article reçu, `concatMap` appellera et attendra que cette requête soit terminée avant de passer à l'article suivant. `pipe``createArticleSearchObservable`
- * 4. Enfin, nous utiliserons l'opérateur `toArray` pour collecter tous les résultats individuels dans un seul tableau, afin d'obtenir un comportement final similaire à . `forkJoin`
- */
+
 

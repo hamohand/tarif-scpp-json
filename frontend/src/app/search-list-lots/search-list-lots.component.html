@@ -1,30 +1,36 @@
-<!-- Section pour charger le fichier -->
-<div class="file-upload-container">
-    <h1>Marche correctement avec Open AI (gpt4.1)</h1>
-    <h2>1. Charger votre fichier de données</h2>
-    ### Créer un fichier avec une colonne 'Articles' qui contient les noms des articles. Créer une colonne 'Codes' qui contient les codes des articles.une
-    deuxième colonne 'Code' vide, cette colonne sera remplie par l'application dans le fichier résultat.
-    ### Comment convertir un fichier Excel au format CSV ?
-    C'est un processus simple :
-    1. Ouvrez votre fichier dans Excel.
-    2. Allez dans le menu `Fichier` > `Enregistrer sous`.
-    3. Dans la boîte de dialogue, choisissez un emplacement pour enregistrer le fichier.
-    4. Dans le champ `Type de fichier`, sélectionnez **CSV (séparateur : virgule) (*.csv)**.
-    5. Cliquez sur `Enregistrer`.
 
-    Vous pourrez ensuite charger ce fichier `.csv` dans votre application.
+<!-- Section démarche à suivre -->
+<div *ngIf="!isSaved">
+    <h3>Démarche à suivre (Openai gpt4.1)</h3>
+    <ol><li>Création ou mise à jour du fichier de données</li>
+    <li>Chargement du fichier</li>
+    <li>Lancement de la recherche</li>
+    <li>Création automatique et enregistrement du fichier résultant de la recherche</li></ol>
+</div>
+    <!-- Section pour charger le fichier -->
+<div *ngIf="lesarticles.length == 0" class="file-upload-container">
+    <h4>1. Créer ou mettre à jour le fichier de données</h4>
+    <ul>
+        <li>doit contenir une colonne à en-tête '<b>article</b>' pour les descriptions des articles</li>
+        <li>doit contenir une colonne à en-tête '<b>code</b>', cette colonne est laissée vide elle sera remplie par l'application dans le fichier résultat.</li>
+        <li>Les fichiers de données (tableurs) <b>acceptés</b> : <b>-</b> Excel (.xls, .xlsx) <b>-</b> LibreOffice (.ods) <b>-</b> Les fichiers au format CSV avec la <code>tabulation</code> comme délimiteur (.csv ou .tsv) <b>-</b> Les fichiers Google Sheets sont convertis en '.tsv'.</li>
+    </ul>
 
-    <p>Sélectionnez un fichier .tsv ou .csv depuis votre ordinateur.</p>
-    <input type="file" (change)="onFileSelected($event)" accept=".tsv,.csv,.txt" />
+    <h4>2. Charger le fichier de données</h4>
+            <ul>
+                <li>choisir l'emplacement du fichier de données,</li>
+                <li>le sélectionner et cliquez sur 'Ouvrir'.</li></ul>
+
+    <input type="file" (change)="onFileSelected($event)" accept=".csv, .tsv, .xls, .xlsx, .ods" />
     <div *ngIf="isLoading && !isSearchComplete" class="loading-message">
         Chargement du fichier en cours...
     </div>
 </div>
 
 <!-- Le reste de l'interface est affiché seulement si un fichier est chargé -->
-<div *ngIf="lesarticles.length > 0">
+    <div *ngIf="lesarticles.length > 0 && !isSearchComplete">
     <hr>
-    <h2>2. Lancer la recherche</h2>
+    <h3>3. Lancer la recherche</h3>
     <p>Fichier chargé : <strong>{{ fileName }}</strong></p>
 
     <h3  *ngIf="!isSearchComplete">Données du fichier :</h3>
@@ -47,8 +53,16 @@
         >
             {{ isLoading ? 'Recherche en cours...' : 'Lancer la recherche des codes' }}
         </button>
+    </div></div>
 
-        <!-- Ce bouton n'apparaît qu'une fois la recherche terminée -->
+<!-- Ce bouton n'apparaît qu'une fois la recherche terminée -->
+        <div  *ngIf="isSearchComplete && !isLoading && !isSaved">
+        <h3>4. Création automatique du fichier résultat de la recherche</h3>
+        Le fichier résultat est toujours au format CSV avec la tabulation comme délimiteur (.tsv). Il porte le nom du fichier de données précédé de "<code>resultat-</code>" et son extension est toujous '.tsv".
+        Dans la boîte de dialogue :
+            <ul>
+                <li>choisir l'emplacement du fichier résultat,</li>
+                <li>cliquez sur `Enregistrer`.</li></ul>
         <button
                 *ngIf="isSearchComplete && !isLoading"
                 (click)="saveAndDownload()"
@@ -56,13 +70,12 @@
         >
             Enregistrer et Télécharger les résultats
         </button>
-    </div>
 
     <div *ngIf="error" class="error-message">
         {{ error }}
     </div>
 
-    <h3 *ngIf="isSearchComplete">- Données mises à jour :</h3>
+    <h4 *ngIf="isSearchComplete">- Données mises à jour :</h4>
     <table class="couleurFond" border="0" width="70%" *ngIf="isSearchComplete">
         <tbody>
         <tr *ngFor="let e of lesarticles">
@@ -73,6 +86,9 @@
         </tr>
         </tbody>
     </table>
-</div>
+   </div>
+<h4 *ngIf="isSaved">** Votre fichier a été enregistré, vous pouvez maintenant l'utiliser.</h4>
+
+
 
 
