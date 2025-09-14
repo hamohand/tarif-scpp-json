@@ -43,7 +43,7 @@ services:
     container_name: ${PROJECT_NAME}-${DB_SERVICE_NAME}
     restart: unless-stopped
     env_file:
-      - .env
+      - ../tci/tarif-essais250912/demo/.env
     healthcheck:
       test: [ "CMD", "pg_isready", "-h", "localhost", "-U", "${POSTGRES_USER}" ]
       interval: 10s
@@ -60,7 +60,7 @@ services:
     container_name: ${PROJECT_NAME}-${BACKEND_SERVICE_NAME} # à enlever (?!)
     restart: unless-stopped
     env_file:
-      - .env
+      - ../tci/tarif-essais250912/demo/.env
     environment:
       - "SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}"
     depends_on:

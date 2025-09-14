@@ -32,7 +32,7 @@ Thumbs.db
 # Environment and secret files
 # ========================
 *.env
-.env
+../tci/tarif-essais250912/demo/.env
 
 # ========================
 # Temporary files

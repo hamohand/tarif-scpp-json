@@ -1,4 +1,4 @@
-
+<div class="search-container">
 <!-- Section démarche à suivre -->
 <div *ngIf="!isSaved">
     <h3>Démarche à suivre (Openai gpt4.1)</h3>
@@ -7,13 +7,14 @@
     <li>Lancement de la recherche</li>
     <li>Création automatique et enregistrement du fichier résultant de la recherche</li></ol>
 </div>
+<hr style="width: 66%">
     <!-- Section pour charger le fichier -->
 <div *ngIf="lesarticles.length == 0" class="file-upload-container">
     <h4>1. Créer ou mettre à jour le fichier de données</h4>
     <ul>
-        <li>doit contenir une colonne à en-tête '<b>article</b>' pour les descriptions des articles</li>
-        <li>doit contenir une colonne à en-tête '<b>code</b>', cette colonne est laissée vide elle sera remplie par l'application dans le fichier résultat.</li>
-        <li>Les fichiers de données (tableurs) <b>acceptés</b> : <b>-</b> Excel (.xls, .xlsx) <b>-</b> LibreOffice (.ods) <b>-</b> Les fichiers au format CSV avec la <code>tabulation</code> comme délimiteur (.csv ou .tsv) <b>-</b> Les fichiers Google Sheets sont convertis en '.tsv'.</li>
+        <li>il doit contenir une colonne à en-tête '<b>article</b>' pour les descriptions des articles</li>
+        <li>il doit contenir une colonne à en-tête '<b>code</b>', cette colonne est laissée vide elle sera remplie par l'application dans le fichier résultat.</li>
+        <li><b>type</b> accepté : <b>-</b> Excel (.xls, .xlsx) <b>-</b> LibreOffice (.ods) <b>-</b> Les fichiers au format CSV avec la <code>tabulation</code> comme délimiteur (.csv ou .tsv) <b>-</b> Les fichiers Google Sheets sont convertis en '.tsv'.</li>
     </ul>
 
     <h4>2. Charger le fichier de données</h4>
@@ -89,6 +90,6 @@
    </div>
 <h4 *ngIf="isSaved">** Votre fichier a été enregistré, vous pouvez maintenant l'utiliser.</h4>
 
-
+</div>
 
 

@@ -33,7 +33,7 @@ node_modules/
 # ========================
 *.env
 *.env.*
-.env
+../tci/tarif-essais250912/demo/.env
 /sql
 
 ### IntelliJ IDEA ###

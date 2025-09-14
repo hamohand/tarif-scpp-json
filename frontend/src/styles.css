@@ -2,22 +2,20 @@
   padding: 20px;
   max-width: 800px;
   margin: 0 auto;
-  background-color: #e5f6ff; /* Couleur douce pour rappeler l'océan */
-  border-radius: 12px;
-  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.12); /* Effets d'ombre modernisé */
+
 }
 
 h2 {
   text-align: center;
   margin-bottom: 25px;
-  color: #034078; /* Bleu profond pour un look élégant */
+    color: hsl(210, 100%, 35%); /* Un bleu plus vif mais toujours professionnel */
   font-size: 24px;
   font-weight: 700;
 }
 /* Remise en forme des textes pour évoquer le thème */
-h3 {
+h3,h4,h5,h6 {
     font-family: 'Georgia', serif;
-    color: #05445e; /* Bleu profond pour les titres */
+    color: hsl(210, 100%, 35%); /* Un bleu plus vif mais toujours professionnel */
     text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Espace et profondeur */
 }
 
@@ -45,7 +43,7 @@ h3 {
   background-color: #eef9ff; /* Couleur plus claire pour mettre l'utilisateur à l'aise */
 }
 
-.search-button {
+input [type="file"], button, .search-button {
   padding: 14px 20px;
   font-size: 16px;
   background-color: #003d6b; /* Bleu profond évoquant l'océan */
@@ -58,12 +56,12 @@ h3 {
   transition: all 0.3s ease-in-out;
 }
 
-.search-button:hover:not(:disabled) {
+input [type="file"], button, .search-button:hover:not(:disabled) {
   background-color: #005082; /* Bleu légèrement plus clair en survol */
   transform: scale(1.05); /* Agrandir légèrement pour l'interaction */
 }
 
-.search-button:disabled {
+input [type="file"], button, .search-button:disabled {
   background-color: #bdc3c7;
   cursor: not-allowed;
   opacity: 0.6;
@@ -122,7 +120,7 @@ pre {
     font-size: 14px;
   }
 
-  .search-button {
+    input [type="file"], button, .search-button {
     padding: 12px;
     font-size: 14px;
   }
@@ -153,7 +151,6 @@ body {
   padding: 30px;
   max-width: 800px;
   width: 90%;
-  text-align: center;
 }
 
 /* Effet “vague” fluide sur l’arrière-plan */
@@ -183,95 +180,3 @@ button:hover {
   width: 100%;
   z-index: -1; /* Derrière tout le contenu */
 }
-
-
-
-
-/*
-!* Global Styles *!
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  line-height: 1.6;
-  color: #333;
-  background-color: #f8f9fa;
-  background-image: linear-gradient(to bottom right, #f8f9fa, #e9ecef);
-  min-height: 100vh;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  line-height: 1.2;
-  color: #2c3e50;
-}
-
-h1 {
-  font-size: 2.5rem;
-  letter-spacing: -0.5px;
-}
-
-h2 {
-  font-size: 2rem;
-  letter-spacing: -0.3px;
-}
-
-h3 {
-  font-size: 1.75rem;
-}
-
-p {
-  margin-bottom: 1rem;
-}
-
-button {
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-}
-
-button:hover {
-  transform: translateY(-2px);
-}
-
-.container {
-  width: 100%;
-  padding-right: 15px;
-  padding-left: 15px;
-  margin-right: auto;
-  margin-left: auto;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  background-color: white;
-  border-radius: 8px;
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
-
-@media (min-width: 576px) {
-  .container {
-    max-width: 540px;
-  }
-}
-
-@media (min-width: 768px) {
-  .container {
-    max-width: 720px;
-  }
-}
-
-@media (min-width: 992px) {
-  .container {
-    max-width: 960px;
-  }
-}
-
-@media (min-width: 1200px) {
-  .container {
-    max-width: 1140px;
-  }
-}
-*/
